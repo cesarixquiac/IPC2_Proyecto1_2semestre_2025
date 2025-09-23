@@ -12,12 +12,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.mycompany.ipc2_proyecto01_2025.semestre.gestorcongreso.Db.DatabaseConnectionSingleStone;
+import java.sql.* ;
+import javax.servlet.http.*;
+
 
 /**
  *
  * @author cesar
  */
-@WebServlet(name = "LoginServlet", urlPatterns = {"/Login"})
+@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
 
     /**
@@ -71,8 +75,58 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+             String correo = request.getParameter("correo");
+            String password = request.getParameter("password");
+            
+            Connection con = null;
+            
+             try {
+            con = DatabaseConnectionSingleStone.getInstance().getConnection();
+
+            String sql = "SELECT id, nombre_completo, rol FROM usuario " +
+                         "WHERE correo=? AND password=? AND activo=TRUE";
+
+            PreparedStatement ps = con.prepareStatement(sql);   
+            ps.setString(1, correo);
+            ps.setString(2, password); 
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                // Usuario valido
+                HttpSession session = request.getSession();
+                session.setAttribute("usuarioId", rs.getInt("id"));
+                session.setAttribute("nombre", rs.getString("nombre_completo"));
+                session.setAttribute("rol", rs.getString("rol"));
+
+                // Redirigir segun rol
+                String rol = rs.getString("rol");
+                switch (rol) {
+                    case "ADMIN_SISTEMA":
+                        response.sendRedirect("AdminSistema.jsp");
+                        break;
+                    case "ADMIN_CONGRESO":
+                        response.sendRedirect("Congreso.jsp");
+                        break;
+                    default:
+                        response.sendRedirect("Participante.jsp");
+                        break;
+                }
+
+            } else {
+                // Usuario o contraseña incorrectos
+                request.setAttribute("error", "Correo o contraseña incorrectos");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+            }
+
+        } catch (SQLException e) {
+            throw new ServletException("Error al conectar a la base de datos", e);
+        }
     }
+        
+
+    
 
     /**
      * Returns a short description of the servlet.
