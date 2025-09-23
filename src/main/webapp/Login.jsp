@@ -15,6 +15,12 @@
 </head>
 <body>
 
+    <% if (request.getAttribute("error") != null) { %>
+    <div class="alert alert-danger">
+        <%= request.getAttribute("error") %>
+    </div>
+<% } %>
+    
 <section class="vh-100">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -52,7 +58,7 @@
 
                   <a class="small text-muted" href="#!">Forgot password?</a>
                   <p class="mb-5 pb-lg-2">Don't have an account? 
-                    <a href="#!">Register here</a>
+                    <a href="Register.jsp">Register here</a>
                   </p>
                   <a href="#!" class="small text-muted">Terms of use.</a>
                   <a href="#!" class="small text-muted">Privacy policy</a>
