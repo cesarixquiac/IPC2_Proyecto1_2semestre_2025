@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mycompany.ipc2_proyecto01_2025.semestre.gestorcongreso.Db.DatabaseConnectionSingleStone;
 import java.sql.* ;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.*;
 
 
@@ -117,11 +119,13 @@ public class LoginServlet extends HttpServlet {
             } else {
                 // Usuario o contraseña incorrectos
                 request.setAttribute("error", "Correo o contraseña incorrectos");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                request.getRequestDispatcher("Login.jsp").forward(request, response);
             }
 
         } catch (SQLException e) {
             throw new ServletException("Error al conectar a la base de datos", e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
         
